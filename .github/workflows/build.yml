@@ -3,6 +3,7 @@ name: Build Carhartt
 on:
   push:
     branches: [ "main" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
 
@@ -14,12 +15,11 @@ jobs:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest  # For a list of available runner types, refer to
-                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: windows-latest
 
     env:
-      Solution_Name: Carhartt.sln                         # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path: src\Carhartt.Core.Tests\Carhartt.Core.Tests.csproj # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Solution_Name: Carhartt.sln
+      Test_Project_Path: src\Carhartt.Core.Tests\Carhartt.Core.Tests.csproj
 
     steps:
     - name: Checkout
@@ -27,33 +27,35 @@ jobs:
       with:
         fetch-depth: 0
 
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
 
-    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
 
-    # Decode the base 64 encoded pfx and save the Signing_Certificate
-    # We are not signing for this simple example, so skipping this step or using a self-signed if needed.
-    # For now, we just build.
-
-    # Execute all unit tests in the solution
-    # - name: Execute unit tests
-    #   run: dotnet test
-    #   # Not implementing tests yet as we don't have a test project setup in the plan, but good to have placeholders.
-
-    # Build the Windows Application
     - name: Build
       run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
+
+    - name: Publish App
+      if: matrix.configuration == 'Release'
+      run: dotnet publish src/Carhartt.App/Carhartt.App.csproj -c Release -r win-x64 --self-contained false -o ./publish
+
+    - name: Compress Release
+      if: matrix.configuration == 'Release' && startsWith(github.ref, 'refs/tags/')
+      run: Compress-Archive -Path ./publish/* -DestinationPath Carhartt-win-x64.zip
+
+    - name: Create Release
+      if: matrix.configuration == 'Release' && startsWith(github.ref, 'refs/tags/')
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        gh release create ${{ github.ref_name }} Carhartt-win-x64.zip --generate-notes
