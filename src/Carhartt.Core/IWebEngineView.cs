@@ -12,6 +12,7 @@ namespace Carhartt.Core
         void Reload();
         void Stop();
         void OpenDevTools();
+        Task<System.Collections.Generic.IEnumerable<int>> GetProcessIds();
 
         event EventHandler<string> UrlChanged;
         event EventHandler<string> TitleChanged;

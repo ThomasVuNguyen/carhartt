@@ -9,3 +9,4 @@ C:\Users\frost\Documents\GitHub\carhartt\src\Carhartt.Core\obj\Debug\net9.0\Carh
 C:\Users\frost\Documents\GitHub\carhartt\src\Carhartt.Core\obj\Debug\net9.0\refint\Carhartt.Core.dll
 C:\Users\frost\Documents\GitHub\carhartt\src\Carhartt.Core\obj\Debug\net9.0\Carhartt.Core.pdb
 C:\Users\frost\Documents\GitHub\carhartt\src\Carhartt.Core\obj\Debug\net9.0\ref\Carhartt.Core.dll
+C:\Users\frost\Documents\GitHub\carhartt\src\Carhartt.Core\obj\Debug\net9.0\Carhartt.Core.sourcelink.json

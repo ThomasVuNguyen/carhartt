@@ -2,14 +2,14 @@ using System;
 
 namespace Carhartt.Core
 {
-    public class BrowserViewModel : ViewModelBase
+    public class TabViewModel : ViewModelBase
     {
         private readonly IWebEngineView _view;
         private string _addressBarUrl = "";
-        private string _title = "Carhartt Browser";
+        private string _title = "New Tab";
         private bool _isLoading;
 
-        public BrowserViewModel(IWebEngineView view)
+        public TabViewModel(IWebEngineView view)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
             
@@ -24,6 +24,8 @@ namespace Carhartt.Core
             StopCommand = new RelayCommand(o => _view.Stop());
             DevToolsCommand = new RelayCommand(o => _view.OpenDevTools());
         }
+
+        public IWebEngineView View => _view; // Expose View for getting PIDs
 
         public string AddressBarUrl
         {
@@ -50,17 +52,16 @@ namespace Carhartt.Core
         public RelayCommand StopCommand { get; }
         public RelayCommand DevToolsCommand { get; }
 
-        private void Navigate()
+        public void Navigate(string? urlOverride = null)
         {
-            if (!string.IsNullOrWhiteSpace(AddressBarUrl))
+            string targetUrl = urlOverride ?? AddressBarUrl;
+            if (!string.IsNullOrWhiteSpace(targetUrl))
             {
-                // Basic normalization
-                string url = AddressBarUrl;
-                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                if (!targetUrl.StartsWith("http://") && !targetUrl.StartsWith("https://"))
                 {
-                    url = "https://" + url;
+                    targetUrl = "https://" + targetUrl;
                 }
-                _view.Navigate(url);
+                _view.Navigate(targetUrl);
             }
         }
     }

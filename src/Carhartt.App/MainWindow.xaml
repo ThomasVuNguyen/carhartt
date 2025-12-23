@@ -3,24 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:engine="clr-namespace:Carhartt.App.Engine"
+        xmlns:core="clr-namespace:Carhartt.Core;assembly=Carhartt.Core"
         mc:Ignorable="d"
-        Title="{Binding Title, FallbackValue='Carhartt Browser'}" Height="768" Width="1024">
+        Title="Carhartt Browser" Height="768" Width="1024">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
+        <!-- Tab Content Template -->
+        <DataTemplate DataType="{x:Type core:TabViewModel}">
+            <ContentControl Content="{Binding View}" />
+        </DataTemplate>
     </Window.Resources>
+    
     <Window.InputBindings>
-        <KeyBinding Key="F12" Command="{Binding DevToolsCommand}" />
+        <KeyBinding Key="T" Modifiers="Ctrl" Command="{Binding AddTabCommand}" />
+        <KeyBinding Key="W" Modifiers="Ctrl" Command="{Binding CloseTabCommand}" CommandParameter="{Binding SelectedTab}" />
+        <!-- Pass F12 to SelectedTab -->
+        <KeyBinding Key="F12" Command="{Binding SelectedTab.DevToolsCommand}" />
     </Window.InputBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Toolbar -->
-        <Border Grid.Row="0" Padding="5" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1">
-            <Grid>
+        <!-- Menu / Top Bar (Optional, simpler to put Add Tab button here or in TabControl) -->
+        
+        <!-- Toolbar (Global, Acts on SelectedTab) -->
+        <Border Grid.Row="1" Padding="5" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1">
+            <Grid DataContext="{Binding SelectedTab}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -41,16 +55,60 @@
                     </TextBox.InputBindings>
                 </TextBox>
                 
-                
                 <Button Grid.Column="5" Command="{Binding NavigateCommand}" Content="Go" Width="30"/>
             </Grid>
         </Border>
-        
-        <ProgressBar Grid.Row="0" VerticalAlignment="Bottom" Height="2" IsIndeterminate="True" 
-                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" 
+
+        <!-- Loading Indicator -->
+        <ProgressBar Grid.Row="1" VerticalAlignment="Bottom" Height="2" IsIndeterminate="True" 
+                     DataContext="{Binding SelectedTab}"
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed}" 
                      Background="Transparent" BorderThickness="0"/>
 
-        <!-- Browser View -->
-        <engine:WebView2Adapter Grid.Row="1" x:Name="browserView" />
+        <!-- Tabs -->
+        <TabControl Grid.Row="2" ItemsSource="{Binding Tabs}" SelectedItem="{Binding SelectedTab}" Background="White">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Title}" MaxWidth="150" TextTrimming="CharacterEllipsis" Margin="0,0,5,0"/>
+                        <Button Content="x" Command="{Binding DataContext.CloseTabCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="{Binding}" Width="15" Height="15" FontSize="10" Padding="0"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <!-- ContentTemplate is implicit via DataTemplate DataType above if we remove this, 
+                 OR we bind Content to View explicitly. 
+                 TabControl automatically uses ItemTemplate for Header and ContentTemplate for Content.
+                 However, ItemsSource is TabViewModels.
+                 We defined a DataTemplate for TabViewModel in Resources.
+                 So we don't need explicit ContentTemplate if TabControl uses the object as content.
+            -->
+        </TabControl>
+        
+        <!-- Add Tab Button overlay or separate? 
+             Simplest is a button next to TabControl headers, but that requires ControlTemplate hacking.
+             For MVP, let's put "New Tab" button in the Toolbar or a menu.
+             Actually, let's put it in row 0 above toolbar? 
+             Or just rely on CTRL+T. 
+             Let's add a small "+" button in Row 0 for visibility.
+        -->
+        <Button Grid.Row="0" HorizontalAlignment="Left" Content="+ New Tab" Padding="5,2" Margin="5" Command="{Binding AddTabCommand}"/>
+
+        <!-- StatusBar -->
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock Text="Memory: " FontWeight="Bold"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding MemoryUsageMb}" Width="60"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock Text="CPU: " FontWeight="Bold"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Text="{Binding CpuUsagePercent}" Width="50"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

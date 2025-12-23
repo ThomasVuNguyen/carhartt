@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Carhartt.Core;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 
 namespace Carhartt.App.Engine
 {
@@ -70,6 +71,29 @@ namespace Carhartt.App.Engine
         public void OpenDevTools()
         {
             webView.CoreWebView2?.OpenDevToolsWindow();
+        }
+
+        public Task<System.Collections.Generic.IEnumerable<int>> GetProcessIds()
+        {
+            var pids = new System.Collections.Generic.List<int>();
+            if (webView.CoreWebView2 != null)
+            {
+                try
+                {
+                    uint browserPid = webView.CoreWebView2.BrowserProcessId;
+                    pids.Add((int)browserPid);
+
+                    /* TODO: Fix build error with GetProcessInfos
+                    var infos = webView.CoreWebView2.GetProcessInfos();
+                    foreach (var info in infos)
+                    {
+                        pids.Add(info.ProcessId);
+                    }
+                    */
+                }
+                catch { }
+            }
+            return Task.FromResult<System.Collections.Generic.IEnumerable<int>>(pids);
         }
     }
 }
