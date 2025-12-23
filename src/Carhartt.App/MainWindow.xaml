@@ -1,0 +1,56 @@
+﻿<Window x:Class="Carhartt.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:engine="clr-namespace:Carhartt.App.Engine"
+        mc:Ignorable="d"
+        Title="{Binding Title, FallbackValue='Carhartt Browser'}" Height="768" Width="1024">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="F12" Command="{Binding DevToolsCommand}" />
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Padding="5" Background="#F0F0F0" BorderBrush="#CCCCCC" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Command="{Binding BackCommand}" Content="&lt;" Width="30" Margin="0,0,5,0"/>
+                <Button Grid.Column="1" Command="{Binding ForwardCommand}" Content="&gt;" Width="30" Margin="0,0,5,0"/>
+                <Button Grid.Column="2" Command="{Binding ReloadCommand}" Content="R" Width="30" Margin="0,0,5,0"/>
+                <Button Grid.Column="3" Command="{Binding StopCommand}" Content="X" Width="30" Margin="0,0,5,0"/>
+
+                <TextBox Grid.Column="4" Text="{Binding AddressBarUrl, UpdateSourceTrigger=PropertyChanged}" VerticalContentAlignment="Center" Margin="0,0,5,0">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Return" Command="{Binding NavigateCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+                
+                
+                <Button Grid.Column="5" Command="{Binding NavigateCommand}" Content="Go" Width="30"/>
+            </Grid>
+        </Border>
+        
+        <ProgressBar Grid.Row="0" VerticalAlignment="Bottom" Height="2" IsIndeterminate="True" 
+                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}" 
+                     Background="Transparent" BorderThickness="0"/>
+
+        <!-- Browser View -->
+        <engine:WebView2Adapter Grid.Row="1" x:Name="browserView" />
+    </Grid>
+</Window>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "83IxBqepjBw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\frost\\Documents\\GitHub\\carhartt\\src\\Carhartt.App\\Carhartt.App.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\frost\\.nuget\\packages\\microsoft.web.webview2\\1.0.3650.58\\microsoft.web.webview2.1.0.3650.58.nupkg.sha512"
+  ],
+  "logs": []
+}
