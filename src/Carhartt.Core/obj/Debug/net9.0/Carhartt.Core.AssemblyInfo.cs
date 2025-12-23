@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Carhartt.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d6d862e9d31f99f6bec77f6f3701ba6da314b3d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a823b65a6f149efc0865ace3b73e5ab84e9462a0")]
 [assembly: System.Reflection.AssemblyProductAttribute("Carhartt.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Carhartt.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

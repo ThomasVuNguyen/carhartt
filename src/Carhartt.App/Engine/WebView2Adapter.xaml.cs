@@ -28,6 +28,18 @@ namespace Carhartt.App.Engine
             };
             webView.SourceChanged += (s, e) => UrlChanged?.Invoke(this, webView.Source.ToString());
             webView.ContentLoading += (s, e) => { }; // Optional
+
+            // Handle server certificate errors (e.g. self-signed)
+            webView.CoreWebView2InitializationCompleted += (s, e) =>
+            {
+                if (e.IsSuccess)
+                {
+                    webView.CoreWebView2.ServerCertificateErrorDetected += (object? sender, CoreWebView2ServerCertificateErrorDetectedEventArgs args) =>
+                    {
+                        args.Action = CoreWebView2ServerCertificateErrorAction.AlwaysAllow;
+                    };
+                }
+            };
         }
 
         public async Task InitializeAsync(string userDataFolder)
